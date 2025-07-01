@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userSchema.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -6,10 +6,6 @@ export const createUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        // Validate input 
-        if (!username || !email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -37,11 +33,6 @@ export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate input 
-        if (!email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
         // Check if user exists
         const user = await User.findOne({ email });
         if (!user) {
@@ -59,7 +50,7 @@ export const loginUser = async (req, res) => {
         const refreshToken = jwt.sign({ _id: user._id}, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d'});
 
         // Set refreshs token in cookies
-        res.cookies('refreshToken', refreshToken, {
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             sameSite: 'strict', // Prevent CSRF attacks
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -86,3 +77,13 @@ export const logoutUser = (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const checkAuth = (req, res) => {
+    try {
+        res.status(200).json(req.user);
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
