@@ -4,6 +4,7 @@ import { IoMdSettings } from "react-icons/io";
 import { TbLogout2 } from "react-icons/tb";
 import { useState } from 'react';
 import FriendList from '../templates/friendList';
+import QueueList from '../templates/queueList';
 
 const NavigationBar = () => {
     const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -23,14 +24,11 @@ const NavigationBar = () => {
         switch (sliderContent) {
             case 'home':
                 return (
-                    <FriendList/>
+                    <QueueList/>
                 );
             case 'friends':
                 return (
-                    <div className="p-4">
-                        <h2 className="text-xl font-semibold mb-2">Friends & Connections</h2>
-                        <p>Manage your social network here.</p>
-                    </div>
+                    <FriendList/>
                 );
             case 'settings':
                 return (
