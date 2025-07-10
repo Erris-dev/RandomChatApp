@@ -8,7 +8,7 @@ const Home = () => {
     return (
         <div className="flex h-screen bg-[#F9F9F9]">
             <NavigationBar/>
-            <ConnectPage/>
+            <ChatBox/>
 
         </div>
     )

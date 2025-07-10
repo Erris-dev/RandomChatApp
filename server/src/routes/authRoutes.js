@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createUser, loginUser, logoutUser, checkAuth} from "../controllers/authController.js";
 import { refreshAccessToken } from "../middleware/utils.js";
+import { authenticateToken } from "../middleware/utils.js";
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.post('/logout', logoutUser);
 router.post('/refresh-token', refreshAccessToken);
 
 //Route to check authentication
-router.get('/check-auth', checkAuth);
+router.get('/check-auth',authenticateToken, checkAuth);
 
 //Export the router
 export default router;
