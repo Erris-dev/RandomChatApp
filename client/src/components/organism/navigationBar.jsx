@@ -5,10 +5,13 @@ import { TbLogout2 } from "react-icons/tb";
 import { useState } from 'react';
 import FriendList from '../templates/friendList';
 import QueueList from '../templates/queueList';
+import Settings from '../templates/settings';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const NavigationBar = () => {
     const [isSliderOpen, setIsSliderOpen] = useState(false);
     const [sliderContent, setSliderContent] = useState('');
+    const { logout, authUser} = useAuthStore();
 
     const handleIconClick = (content) => {
         if (isSliderOpen && sliderContent === content) {
@@ -19,6 +22,12 @@ const NavigationBar = () => {
             setSliderContent(content);
         }
     };
+
+    const handleLogOut = () => {
+        if (authUser) {
+            logout();
+        }
+    }
 
     const renderSliderContent = () => {
         switch (sliderContent) {
@@ -32,10 +41,7 @@ const NavigationBar = () => {
                 );
             case 'settings':
                 return (
-                    <div className="p-4">
-                        <h2 className="text-xl font-semibold mb-2">Application Settings</h2>
-                        <p>Configure your preferences.</p>
-                    </div>
+                   <Settings/>
                 );
             default:
                 return (
@@ -68,9 +74,10 @@ const NavigationBar = () => {
                 </div>
 
                 <div className='flex-grow flex items-end pb-4'>
-                    <div className='text-white text-2xl p-1 rounded-md cursor-pointer hover:bg-[#262630] hover:scale-110 transition-all duration-200'>
+                    <button className='text-white text-2xl p-1 rounded-md cursor-pointer hover:bg-[#262630] hover:scale-110 transition-all duration-200'
+                    onClick={handleLogOut}>
                         <TbLogout2 />
-                    </div>
+                    </button>
                 </div>
             </div>
 

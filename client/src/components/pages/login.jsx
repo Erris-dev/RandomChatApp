@@ -1,6 +1,21 @@
-import React from "react";
+import {useState} from "react";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const  Login = () => {
+
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    })
+
+    const {login, isLoggingIn} = useAuthStore();
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        login(formData);
+    }
+
     return (
         <div className="flex items-center justify-center h-screen bg-gray-900">
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
@@ -8,7 +23,7 @@ const  Login = () => {
                     <h1 className="text-2xl font-bold">Random Chat App</h1>
                     <p className="text-xs font-medium">Please login to continue</p>
                 </div>
-                <form action="">
+                <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                             Email
@@ -18,6 +33,8 @@ const  Login = () => {
                             id="email"
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
                         />
                     </div>
                     <div className="mb-6">
@@ -29,6 +46,8 @@ const  Login = () => {
                             id="password"
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your password"
+                            value={formData.password}
+                            onChange={(e) => setFormData({...formData, password: e.target.value})}
                         />
                     </div>
                     <button
