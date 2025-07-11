@@ -1,6 +1,8 @@
-import { ChatSession } from '../models/chatSessionSchema.js';
+import  ChatSession  from '../models/chatSessionSchema.js';
 
 export const findOrCreateChatSession = async (userA, userB) => {
+    console.log(userA, userB);
+
     const [id1, id2] = [userA.toString(), userB.toString()].sort();
 
         let chatSession = await ChatSession.findOne({

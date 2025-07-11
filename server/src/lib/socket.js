@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
+import { findOrCreateChatSession } from "../services/sessionService.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -8,7 +9,6 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: ["http://localhost:5173"],
-        credentials: true,
     },
 });
 
@@ -19,6 +19,7 @@ io.on("connection", (socket) => {
     console.log("A user has connected", socket.id);
 
     socket.on("joinQueue", async (userId) => {
+        console.log(`joinQueue from socket ${socket.id}: userId =`, userId);
 
         if(queue.find(user => user.userId === userId)) return;
 
@@ -42,7 +43,8 @@ io.on("connection", (socket) => {
 
 
     socket.on("disconnect", () => {
-        console.log("A user has disconnected", socket.id)
+        console.log("A user has disconnected", socket.id);
+        queue = queue.filter(user => user.socketId !== socket.id);
     });
 });
 

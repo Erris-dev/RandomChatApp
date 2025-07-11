@@ -1,42 +1,57 @@
 import { useEffect } from "react";
-import  Login  from "./components/pages/login.jsx";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuthStore } from "./store/useAuthStore.js";
+import { Loader } from "lucide-react";
+import { Toaster } from "react-hot-toast";
+
+import Login from "./components/pages/login.jsx";
 import Register from "./components/pages/register.jsx";
 import Home from "./components/pages/user/home.jsx";
-import { useAuthStore } from "./store/useAuthStore.js";
-import {Loader} from 'lucide-react';
-import {Route, Routes, Navigate} from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
+import ChatBox from "./components/templates/chatBox.jsx";
+import EditProfile from "./components/pages/user/editProfile.jsx";
 
+import UserLayout from "./components/templates/userLayout.jsx";
 
 function App() {
-  const {authUser, checkAuth, isCheckingAuth} = useAuthStore();
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth])
+  }, [checkAuth]);
 
-  console.log({authUser});
+  console.log(authUser);
 
-  if(isCheckingAuth){
+  if (isCheckingAuth) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader className="size-10 animate-spin" />
       </div>
-    )
+    );
   }
 
   return (
     <div>
-      
       <Routes>
-        <Route path="/home" element={authUser? <Home/> : <Navigate to="/login"/>}/>
-        <Route path="/signup" element={!authUser? <Register/> : <Navigate to="/home"/>}/>
-        <Route path="/login" element={!authUser? <Login/> : <Navigate to="/home"/>}/>
+        {/* Public Routes */}
+        <Route path="/signup" element={!authUser ? <Register /> : <Navigate to="/home" />} />
+        <Route path="/login" element={!authUser ? <Login /> : <Navigate to="/home" />} />
+
+        {/* Protected Routes with Shared Layout */}
+        {authUser && (
+          <Route path="/" element={<UserLayout />}>
+            <Route path="home" element={<Home />} />
+            <Route path="chat" element={<ChatBox />} />
+            <Route path="edit-profile" element={<EditProfile />} />
+          </Route>
+        )}
+        
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to={authUser ? "/home" : "/login"} />} />
       </Routes>
 
-      <Toaster/>
+      <Toaster />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

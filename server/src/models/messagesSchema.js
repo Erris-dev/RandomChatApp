@@ -1,5 +1,4 @@
-import mongoose from './../config/connection.js';
-
+import mongoose from "mongoose";
 const Messages = new mongoose.Schema({
    chatId: {
     type: mongoose.Schema.Types.ObjectId,
