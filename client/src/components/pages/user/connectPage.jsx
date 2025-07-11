@@ -8,7 +8,7 @@ const ConnectPage = () => {
             </div>
             <h1 className='text-3xl font-bold mt-2'> Strangers Today. Friends Tomorrow</h1>
             <p className='text-2xl font-medium'>Start chatting with people worldwide — your next friend is one message away.</p>
-            <button className="bg-[#4D77AD] text-white font-semibold mt-5 rounded-[5px] p-1 w-35 ">Connect!</button>
+            <button className="bg-[#4D77AD] cursor-pointer text-white font-semibold mt-5 rounded-[5px] p-1 w-35 transition duration-200 transform hover:scale-105">Connect!</button>
 
         </div>
     );

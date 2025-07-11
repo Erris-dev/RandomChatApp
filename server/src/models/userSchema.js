@@ -19,6 +19,20 @@ const User = new mongoose.Schema({
     },
     avatar: {
         type: String,
+        default: '',
+    },
+     profession: {
+        type: String,
+        default: '',
+    },
+    location: {
+        type: String,
+        trim: true,
+        default: '',
+    },
+    gender: {
+        type: String,
+        default: '',
     },
     createdAt: {
         type: Date,
