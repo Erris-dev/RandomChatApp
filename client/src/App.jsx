@@ -13,7 +13,7 @@ import EditProfile from "./components/pages/user/editProfile.jsx";
 import UserLayout from "./components/templates/userLayout.jsx";
 
 function App() {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+  const { authUser, checkAuth, getMe, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();

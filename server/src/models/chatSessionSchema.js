@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+
 const ChatSession = new mongoose.Schema({
   userA: {
     type: mongoose.Schema.Types.ObjectId,

@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './src/config/connection.js';
 import authRoutes from './src/routes/authRoutes.js';
+import messageRoutes from './src/routes/messagesRoutes.js';
 import { app, server } from './src/lib/socket.js';
 
 
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 //Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
 
 
 const PORT = process.env.PORT || 5000
