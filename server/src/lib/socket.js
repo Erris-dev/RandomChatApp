@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import { findOrCreateChatSession } from "../services/sessionService.js";
+import { saveMessage } from "../services/messageService.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -39,6 +40,28 @@ io.on("connection", (socket) => {
     socket.on("cancelQueue", (userId) => {
         queue = queue.filter(user => user.userId !== userId);
         socket.emit("queue-cancelled");
+    });
+
+    socket.on("joinRoom", (roomId) => {
+        socket.join(roomId);
+        console.log(`Socket ${socket.id} joined room ${roomId}`);
+    });
+
+    socket.on("sendMessage", async ({ roomId, senderId, content, images = [] }) => {
+        try {
+            const newMessage = await saveMessage({
+                chatId: roomId,
+                senderId,
+                content,
+                images,
+            });
+
+            // 2. Emit the message to both users in the room
+            io.to(roomId).emit("receiveMessage", newMessage);
+        } catch (error) {
+            console.error("Error saving message:", error);
+            socket.emit("message-error", { message: "Failed to send message." });
+        }
     });
 
 
