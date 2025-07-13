@@ -51,6 +51,7 @@ export const openChatSessionWithFriend = async (req, res) => {
     }
 }
 
+
 export const getChatPartnerInfo = async (req, res) => {
     try {
         const chatSessionId = req.params.Id;

@@ -41,7 +41,7 @@ function App() {
           <Route path="/" element={<UserLayout />}>
             <Route path="home" element={<Home />} />
             <Route path="chat" element={<ChatBox />} />
-            <Route path="edit-profile" element={<EditProfile />} />
+            <Route path="settings/edit-profile" element={<EditProfile />} />
           </Route>
         )}
         

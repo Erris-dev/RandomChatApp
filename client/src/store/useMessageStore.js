@@ -4,9 +4,11 @@ import toast from "react-hot-toast";
 
 export const useChatStore = create((set) => ({
     pairedInfo: null,
-    isGettingInfo: false,
     messages: [],
-
+    friends: [],
+    isGettingInfo: false,
+    isLoadingFriends: false,
+    isLoadingMessages: false,
 
     getPartnerInfo: async(chatId) => {
         set({isGettingInfo: true});
@@ -19,5 +21,29 @@ export const useChatStore = create((set) => ({
             set({isGettingInfo: false});
         } 
     },
+
+    getFriends: async() => {
+        set({isLoadingFriends: true});
+        try {
+            const res = await axiosInstance.get('/messages/getFriends');
+            set({friends: res.data});
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({isLoadingFriends: false});
+        }
+    },
+
+    getMessages: async (userId) => {
+        set({isLoadingMessages: true});
+        try {
+            const res = await axiosInstance.get(`/messages/${userId}`);
+            set({messages: res.data});
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({isLoadingMessages: false});
+        }
+    }
 
 }));

@@ -1,4 +1,5 @@
 import Select from "../molecule/Select";
+import { useNavigate } from "react-router";
 
 const europeanCountries = [
     { label: "Albania", value: "albania" },
@@ -56,11 +57,13 @@ const europeanCountries = [
 
 const QueueList = () => {
 
+    const navigate = useNavigate();
+
     return (
         <div className="bg-[#3B3B48] h-screen flex  flex-col border-r-5 border-[#D3D3D3]">
 
-            <div className="p-2 border-b-2 text-xl w-full text-white font-semibold text-center border-[#2f2f3d]">
-                <h1>Random Chat App</h1>
+            <div className="p-2 border-b-2 text-xl w-full cursor-pointer text-white font-semibold text-center border-[#2f2f3d]">
+                <h1 onClick={() => navigate('/home')}>Random Chat App</h1>
             </div>
 
             <p className="text-white text-center text-[15px] mt-5">Choose who you want to talk to!</p>
