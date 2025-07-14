@@ -8,16 +8,16 @@ import ChatSidebar from "../organism/chatSideBar";
 
 const ChatBox = () => {
   const { socket, authUser } = useAuthStore();
-  const { pairedInfo, getPartnerInfo, isGettingInfo } = useChatStore();
+  const { pairedInfo, getPartnerInfo, isGettingInfo, getMessages, messages, setMessages } = useChatStore();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("room");
 
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [images, setImages] = useState([]); // store selected images as base64 strings
   const messagesEndRef = useRef(null);
 
   // Scroll to latest message
+  console.log(roomId)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -29,7 +29,7 @@ const ChatBox = () => {
     socket.emit("joinRoom", roomId);
 
     const handleReceiveMessage = (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]);
+        setMessages(newMessage)
     };
 
     socket.on("receiveMessage", handleReceiveMessage);
@@ -44,6 +44,7 @@ const ChatBox = () => {
   useEffect(() => {
     if (roomId && authUser?._id) {
       getPartnerInfo(roomId);
+      getMessages(roomId);
     }
   }, [roomId, authUser]);
 

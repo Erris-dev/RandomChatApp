@@ -34,7 +34,7 @@ export const useFriendsStore = create((set) => ({
 
     sendFriendRequest: async (recipientId) => {
         try {
-            const res = await axiosInstance.post("/friends/send", recipientId );
+            const res = await axiosInstance.post("/friends/send",  {recipientId} );
             toast.success(res.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to send request");
@@ -43,7 +43,7 @@ export const useFriendsStore = create((set) => ({
 
     acceptRequest: async (requestId) => {
         try {
-            const res = await axiosInstance.post("/friends/accept",  requestId );
+            const res = await axiosInstance.post("/friends/accept",  { requestId } );
             toast.success(res.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to accept");

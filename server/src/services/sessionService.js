@@ -1,23 +1,28 @@
-import  ChatSession  from '../models/chatSessionSchema.js';
+import ChatSession from '../models/chatSessionSchema.js';
 
 export const findOrCreateChatSession = async (userA, userB) => {
-    console.log(userA, userB);
+  const [id1, id2] = [userA.toString(), userB.toString()].sort();
+  const chatKey = `${id1}_${id2}`; // consistent pair identifier
 
-    const [id1, id2] = [userA.toString(), userB.toString()].sort();
+  try {
+    const chatSession = await ChatSession.findOneAndUpdate(
+      { chatKey },
+      {
+        $setOnInsert: {
+          userA: id1,
+          userB: id2,
+          chatKey,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
 
-        let chatSession = await ChatSession.findOne({
-            $or: [
-                { userA: id1, userB: id2 },
-                { userA: id2, userB: id1 },
-            ]
-        });
-
-        if (!chatSession) {
-            chatSession = await ChatSession.create({
-                userA: id1,
-                userB: id2,
-            });
-        }
-
-    return chatSession
-}
+    return chatSession;
+  } catch (error) {
+    console.error("Error in findOrCreateChatSession:", error);
+    throw error;
+  }
+};

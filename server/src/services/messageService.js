@@ -21,7 +21,7 @@ export const saveMessage = async ({ chatId, senderId, content, images }) => {
 
         // Create and save message
         const message = new Messages({
-            chatId,
+            sessionId: chatId,
             senderId,
             content,
             images: uploadedImages,

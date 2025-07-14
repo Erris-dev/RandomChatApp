@@ -11,10 +11,7 @@ const ChatSession = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  lastMessage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Message",
-  },
+  chatKey: { type: String, unique: true, required: true },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -25,12 +22,6 @@ const ChatSession = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-// Ensure uniqueness of chat between two users (order-agnostic)
-ChatSession.index(
-  { userA: 1, userB: 1 },
-  { unique: true }
-);
 
 
 export default mongoose.model("ChatSession", ChatSession);

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const Messages = new mongoose.Schema({
-   chatId: {
+  sessionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "ChatSession",
     required: true,

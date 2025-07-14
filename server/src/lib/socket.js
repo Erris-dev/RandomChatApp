@@ -49,6 +49,7 @@ io.on("connection", (socket) => {
 
     socket.on("sendMessage", async ({ roomId, senderId, content, images = [] }) => {
         try {
+            console.log(roomId);
             const newMessage = await saveMessage({
                 chatId: roomId,
                 senderId,
