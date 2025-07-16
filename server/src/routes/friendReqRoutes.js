@@ -7,6 +7,7 @@ import {
   declineFriendRequest,
   blockFriendRequest,
   cancelFriendRequest,
+  unFriendUser,
 } from "../controllers/friendsController.js";
 import { authenticateToken } from "../lib/utils.js";
 
@@ -32,5 +33,8 @@ router.post("/block", authenticateToken, blockFriendRequest);
 
 // Cancel an outgoing pending request
 router.post("/cancel", authenticateToken, cancelFriendRequest);
+
+// Unfriend a user
+router.post("/unfriend", authenticateToken, unFriendUser);
 
 export default router;

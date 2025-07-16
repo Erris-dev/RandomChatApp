@@ -177,3 +177,31 @@ export const cancelFriendRequest = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const unFriendUser = async (req, res) => {
+    try {
+
+        console.log("UNFRIEND BODY:", req.body);
+
+        const userId = req.user._id;
+        const { friendId } = req.body;
+
+        const friendship = await FriendsSchema.findOneAndDelete({
+            status: "accepted",
+            $or: [
+                { requester: userId, recipient: friendId },
+                { requester: friendId, recipient: userId }
+            ]
+        });
+
+        if (!friendship) {
+            return res.status(404).json({ message: "Friendship not found." });
+        }
+
+        res.status(200).json({ message: "Unfriended successfully." });
+    } catch (error) {
+        console.error("Error unfriending user:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+

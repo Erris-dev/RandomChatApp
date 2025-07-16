@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useChatStore } from "../../store/useMessageStore";
+import { useFriendsStore } from "../../store/useFriendsStore";
 import { useSearchParams } from "react-router";
 import ChatHeader from "../organism/chatHeader";
 import MessageInput from "../organism/MessageInput";
@@ -8,7 +9,15 @@ import ChatSidebar from "../organism/chatSideBar";
 
 const ChatBox = () => {
   const { socket, authUser } = useAuthStore();
-  const { pairedInfo, getPartnerInfo, isGettingInfo, getMessages, messages, setMessages } = useChatStore();
+  const {
+    pairedInfo,
+    getPartnerInfo,
+    isGettingInfo,
+    getMessages,
+    messages,
+    setMessages,
+  } = useChatStore();
+  const { unfriendUser, getFriends } = useFriendsStore();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("room");
 
@@ -17,7 +26,6 @@ const ChatBox = () => {
   const messagesEndRef = useRef(null);
 
   // Scroll to latest message
-  console.log(roomId)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -29,7 +37,7 @@ const ChatBox = () => {
     socket.emit("joinRoom", roomId);
 
     const handleReceiveMessage = (newMessage) => {
-        setMessages(newMessage)
+      setMessages(newMessage);
     };
 
     socket.on("receiveMessage", handleReceiveMessage);
@@ -45,8 +53,17 @@ const ChatBox = () => {
     if (roomId && authUser?._id) {
       getPartnerInfo(roomId);
       getMessages(roomId);
+      getFriends();
     }
   }, [roomId, authUser]);
+
+  const checkIfFriends = useFriendsStore((state) => state.checkIfFriends);
+  const isFriends = pairedInfo?._id ? checkIfFriends(pairedInfo?._id) : false;
+  console.log(isFriends);
+
+  const removeFriend = async () => {
+    await unfriendUser(pairedInfo?._id);
+  };
 
   // Handle sending a message with optional images
   const handleSendMessage = () => {
@@ -155,7 +172,11 @@ const ChatBox = () => {
       </div>
 
       {/* Sidebar */}
-      <ChatSidebar partner={pairedInfo} />
+      <ChatSidebar
+        partner={pairedInfo}
+        isFriend={isFriends}
+        onUnfriend={removeFriend}
+      />
     </div>
   );
 };

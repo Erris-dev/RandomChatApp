@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-export const useFriendsStore = create((set) => ({
+export const useFriendsStore = create((set,get) => ({
     friends: [],
     requests: [],
     isLoadingFriends: false,
@@ -52,7 +52,7 @@ export const useFriendsStore = create((set) => ({
 
     declineRequest: async (requestId) => {
         try {
-            const res = await axiosInstance.post("/friends/decline", requestId );
+            const res = await axiosInstance.post("/friends/decline", {requestId} );
             toast.success(res.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to decline");
@@ -61,7 +61,7 @@ export const useFriendsStore = create((set) => ({
 
     blockRequest: async (requestId) => {
         try {
-            const res = await axiosInstance.post("/friends/block",  requestId );
+            const res = await axiosInstance.post("/friends/block", {requestId} );
             toast.success(res.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to block");
@@ -75,5 +75,20 @@ export const useFriendsStore = create((set) => ({
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to cancel");
         }
-    }
+    },
+
+    unfriendUser: async (friendId) => {
+        try {
+            const res = await axiosInstance.post("/friends/unfriend", {friendId});
+            toast.success(res.data.message);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to unfriend");
+        }
+    },
+
+    checkIfFriends: (userId) => {
+        const friends = get().friends;
+        return friends.some(friend => friend._id === userId);
+    },
+    
 }));

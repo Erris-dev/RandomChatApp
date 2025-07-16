@@ -13,32 +13,116 @@ const io = new Server(server, {
     },
 });
 
-
-let queue = [];
+const MATCH_DELAY_MS = 7000;
+let filteredQueue = [];
 
 io.on("connection", (socket) => {
     console.log("A user has connected", socket.id);
 
-    socket.on("joinQueue", async (userId) => {
-        console.log(`joinQueue from socket ${socket.id}: userId =`, userId);
+    socket.on("joinQueue", async (userProfile) => {
+    const userId = userProfile?.userId;
+    const gender = userProfile?.gender || "";
+    const country = userProfile?.country || "";
+    const profession = userProfile?.profession || "";
+    const mode = (!gender && !country && !profession) ? "random" : "filtered";
+    const joinedAt = Date.now();
 
-        if(queue.find(user => user.userId === userId)) return;
+    if (filteredQueue.find(u => u.userId === userId)) return;
 
-        queue.push({ userId, socketId: socket.id });
-
-        if(queue.length >= 2) {
-            const user1 = queue.shift();
-            const user2 = queue.shift();
-
-            const chatSession = await findOrCreateChatSession(user1.userId, user2.userId);
-
-            io.to(user1.socketId).emit("user-paired", chatSession._id);
-            io.to(user2.socketId).emit("user-paired", chatSession._id);
-        }
+    filteredQueue.push({
+        userId,
+        socketId: socket.id,
+        gender,
+        country,
+        profession,
+        mode,
+        joinedAt,
+        profileGender: gender,
+        profileCountry: country,
+        profileProfession: profession,
     });
 
+    const attemptMatch = async () => {
+        const now = Date.now();
+        const user = filteredQueue.find(u => u.userId === userId);
+        if (!user) return; // Already matched or left
+
+        if (now - user.joinedAt < MATCH_DELAY_MS) {
+            // Wait longer before trying to match
+            setTimeout(attemptMatch, 2000);
+            return;
+        }
+
+        let matchIndex = -1;
+
+        // Helper to check if user waited enough
+        const waitedEnough = (u) => (now - u.joinedAt) >= MATCH_DELAY_MS;
+
+        if (user.mode === "filtered") {
+            // 1. Try matching filtered with filtered users who waited enough and satisfy filters
+            matchIndex = filteredQueue.findIndex(u =>
+                u.userId !== userId &&
+                u.mode === "filtered" &&
+                waitedEnough(u) &&
+                (u.gender === "" || u.gender === user.gender) &&
+                (u.country === "" || u.country === user.country) &&
+                (u.profession === "" || u.profession === user.profession)
+            );
+
+            // 2. If none, try matching filtered with random users who waited enough and satisfy filtered user's filters
+            if (matchIndex === -1) {
+                matchIndex = filteredQueue.findIndex(u =>
+                    u.userId !== userId &&
+                    u.mode === "random" &&
+                    waitedEnough(u) &&
+                    (u.profileGender === "" || u.profileGender === user.gender) &&
+                    (u.profileCountry === "" || u.profileCountry === user.country) &&
+                    (u.profileProfession === "" || u.profileProfession === user.profession)
+                );
+            }
+
+        } else {
+            // mode === "random"
+
+            // 3. Try matching random with random users who waited enough
+            matchIndex = filteredQueue.findIndex(u =>
+                u.userId !== userId &&
+                u.mode === "random" &&
+                waitedEnough(u)
+            );
+
+            // 4. If none, try matching random with filtered users who waited enough and accept random user's profile
+            if (matchIndex === -1) {
+                matchIndex = filteredQueue.findIndex(u =>
+                    u.userId !== userId &&
+                    u.mode === "filtered" &&
+                    waitedEnough(u) &&
+                    (user.gender === "" || u.gender === user.gender) &&
+                    (user.country === "" || u.country === user.country) &&
+                    (user.profession === "" || u.profession === user.profession)
+                );
+            }
+        }
+
+        if (matchIndex !== -1) {
+            const matchedUser = filteredQueue.splice(matchIndex, 1)[0];
+            filteredQueue = filteredQueue.filter(u => u.userId !== userId);
+
+            const chatSession = await findOrCreateChatSession(userId, matchedUser.userId);
+
+            io.to(matchedUser.socketId).emit("user-paired", chatSession._id);
+            io.to(socket.id).emit("user-paired", chatSession._id);
+        } else {
+            setTimeout(attemptMatch, 2000);
+        }
+    };
+
+    setTimeout(attemptMatch, 2000);
+});
+
+
     socket.on("cancelQueue", (userId) => {
-        queue = queue.filter(user => user.userId !== userId);
+        filteredQueue = filteredQueue.filter(user => user.userId !== userId);
         socket.emit("queue-cancelled");
     });
 
@@ -68,7 +152,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log("A user has disconnected", socket.id);
-        queue = queue.filter(user => user.socketId !== socket.id);
+        filteredQueue = filteredQueue.filter(user => user.socketId !== socket.id);
     });
 });
 
