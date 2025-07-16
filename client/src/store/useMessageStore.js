@@ -1,13 +1,13 @@
 import { axiosInstance } from "../lib/axios";
 import { create } from "zustand";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 export const useChatStore = create((set,get) => ({
     pairedInfo: null,
     messages: [],
-    friends: [],
+    savedImages: [],
     isGettingInfo: false,
-    isLoadingFriends: false,
     isLoadingMessages: false,
     isOpeningChat: false,
 
@@ -58,6 +58,27 @@ export const useChatStore = create((set,get) => ({
             toast.error(error.response?.data?.message);
         } finally {
             set({isLoadingMessages: false});
+        }
+    },
+
+    saveImage: async (sessionId, images) => {
+        try {
+            console.log("Saving image with sessionId:", sessionId, "images:", images);
+            const res = await axiosInstance.post('/messages/saveImage', {sessionId, images});
+            toast.success('Image saved successfully');
+        } catch (error) {
+            toast.error('Couldnt save image');
+        }
+    },
+
+    getSaved: async (sessionId) => {
+        try {
+            const res = await axiosInstance.get('/messages/fetchSavedImages', {
+                params: { sessionId },
+            });
+            set({savedImages: res.data});
+        } catch (error) {
+            toast.error('Couldnt get saved images');
         }
     }
 

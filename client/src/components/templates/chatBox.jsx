@@ -16,7 +16,11 @@ const ChatBox = () => {
     getMessages,
     messages,
     setMessages,
+    savedImages,
+    saveImage,
+    getSaved
   } = useChatStore();
+  const [previewImage, setPreviewImage] = useState(null);
   const { unfriendUser, getFriends } = useFriendsStore();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("room");
@@ -24,6 +28,7 @@ const ChatBox = () => {
   const [message, setMessage] = useState("");
   const [images, setImages] = useState([]); // store selected images as base64 strings
   const messagesEndRef = useRef(null);
+
 
   // Scroll to latest message
   useEffect(() => {
@@ -54,12 +59,13 @@ const ChatBox = () => {
       getPartnerInfo(roomId);
       getMessages(roomId);
       getFriends();
+      console.log('This is the room id', roomId);
+      getSaved(roomId)
     }
   }, [roomId, authUser]);
 
   const checkIfFriends = useFriendsStore((state) => state.checkIfFriends);
   const isFriends = pairedInfo?._id ? checkIfFriends(pairedInfo?._id) : false;
-  console.log(isFriends);
 
   const removeFriend = async () => {
     await unfriendUser(pairedInfo?._id);
@@ -86,6 +92,12 @@ const ChatBox = () => {
       handleSendMessage();
     }
   };
+
+  const handleSaveImage = async (imgUrl) => {
+    if (!imgUrl || !roomId) return;
+    await saveImage(roomId, [imgUrl]); 
+  }
+
 
   // Handle image file selection & convert to base64
   const handleImageChange = (files) => {
@@ -146,18 +158,62 @@ const ChatBox = () => {
 
                 {/* Render images */}
                 {msg.images?.map((img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt={`attachment-${i}`}
-                    className="mt-2 max-w-full rounded-lg"
-                  />
+                  <div key={i} className="relative group inline-block mt-2">
+                    <img
+                      src={img}
+                      alt={`attachment-${i}`}
+                      onClick={() => setPreviewImage(img)}
+                      className="max-w-[200px] rounded-lg cursor-pointer hover:opacity-80 transition"
+                    />
+                    <a
+                      href={img}
+                      download={`chat-image-${i}.jpg`}
+                      className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                      onClick={(e) => e.stopPropagation()}
+                      title="Download image"
+                    >
+                      ⬇
+                    </a>
+                  </div>
                 ))}
               </div>
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
+        {previewImage && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center"
+            onClick={() => setPreviewImage(null)}
+          >
+            <div className="relative max-w-[90vw] max-h-[90vh]">
+              <img
+                src={previewImage}
+                alt="Full View"
+                className="rounded-lg max-h-[90vh] max-w-[90vw]"
+              />
+              <button
+              onClick={() => handleSaveImage(previewImage)}
+              className="absolute top-4 right-32 cursor-pointer  text-white bg-black bg-opacity-70 p-2 rounded hover:bg-opacity-90">
+                Save
+                </button>
+              <a
+                href={previewImage}
+                download="chat-image.jpg"
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-4 right-4 text-white bg-black bg-opacity-70 p-2 rounded hover:bg-opacity-90"
+              >
+                Download
+              </a>
+              <button
+                onClick={() => setPreviewImage(null)}
+                className="absolute top-4 left-4 text-white bg-black bg-opacity-70 p-2 rounded hover:bg-opacity-90"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Input Field */}
         <MessageInput
@@ -176,6 +232,7 @@ const ChatBox = () => {
         partner={pairedInfo}
         isFriend={isFriends}
         onUnfriend={removeFriend}
+        saved={savedImages[0]}
       />
     </div>
   );

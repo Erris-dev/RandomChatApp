@@ -9,6 +9,7 @@ import defaultAvatar from "../../assets/default.png";
 
 const FriendList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { friends, isLoading, getFriends } = useFriendsStore();
   const { openChatSessionWithFriend } = useChatStore();
   const { socket } = useAuthStore();
@@ -19,7 +20,6 @@ const FriendList = () => {
   }, [getFriends]);
 
   const handleOpenChat = async (friendId) => {
-    console.log(friendId);
     const session = await openChatSessionWithFriend(friendId);
     if (session) {
       socket.emit("joinRoom", session._id);
@@ -30,6 +30,10 @@ const FriendList = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const filteredFriends = friends.filter((friend) =>
+    friend.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="bg-[#3B3B48] h-screen flex flex-col border-r-5 border-[#D3D3D3]">
       {/* Search Bar */}
@@ -37,6 +41,8 @@ const FriendList = () => {
         <div className="flex items-center bg-[#2f2f3d] px-3 py-2 rounded-full w-full">
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search friends..."
             className="bg-transparent outline-none text-white placeholder-gray-400 flex-grow"
           />
@@ -48,10 +54,10 @@ const FriendList = () => {
       <div className="mt-4 px-3 flex flex-col gap-2 overflow-auto">
         {isLoading ? (
           <p className="text-gray-400 text-sm">Loading friends...</p>
-        ) : friends.length === 0 ? (
-          <p className="text-gray-400 text-sm">No friends yet.</p>
+        ) : filteredFriends.length === 0 ? (
+          <p className="text-gray-400 text-sm">No friends found.</p>
         ) : (
-          friends.map((friend) => (
+          filteredFriends.map((friend) => (
             <div
               key={friend._id}
               onClick={() => handleOpenChat(friend._id)}
@@ -90,7 +96,7 @@ const FriendList = () => {
       </div>
 
       {/* Friend Requests Modal */}
-      <FriendRequestsModal isOpen={isModalOpen} onClose={closeModal} />
+      <FriendRequestsModal isOpen={isModalOpen} onClose={closeModal}  />
     </div>
   );
 };
