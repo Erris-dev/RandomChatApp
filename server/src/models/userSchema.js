@@ -17,6 +17,10 @@ const User = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    isBot: {
+        type: Boolean,
+        default: false,
+    },
     avatar: {
         type: String,
         default: '',

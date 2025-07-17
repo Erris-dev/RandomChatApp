@@ -32,6 +32,7 @@ app.get('/', (req, res) => {
 });
 
 server.listen(PORT, () =>{
+
     console.log(`Server is running on http://localhost:${PORT}`);
     connectDB();
 });

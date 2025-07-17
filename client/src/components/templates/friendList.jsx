@@ -11,7 +11,7 @@ const FriendList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { friends, isLoading, getFriends } = useFriendsStore();
-  const { openChatSessionWithFriend } = useChatStore();
+  const { openChatSessionWithFriend, openChatSessionWithBot } = useChatStore();
   const { socket } = useAuthStore();
   const navigate = useNavigate();
 
@@ -21,6 +21,14 @@ const FriendList = () => {
 
   const handleOpenChat = async (friendId) => {
     const session = await openChatSessionWithFriend(friendId);
+    if (session) {
+      socket.emit("joinRoom", session._id);
+      navigate(`/chat?room=${session._id}`);
+    }
+  };
+
+  const handleOpenBotChat = async () => {
+    const session = await openChatSessionWithBot();
     if (session) {
       socket.emit("joinRoom", session._id);
       navigate(`/chat?room=${session._id}`);
@@ -86,9 +94,15 @@ const FriendList = () => {
 
       {/* Friend Requests Button */}
       <div className="mt-auto p-4">
+        <button
+        onClick={handleOpenBotChat}
+        className="w-full bg-gradient-to-r mb-2 from-indigo-500 to-purple-600 text-white py-2 rounded-lg shadow-md hover:brightness-110 transition"
+      >
+        Chat with AI 🤖
+      </button>
         <div
           onClick={openModal}
-          className="flex items-center gap-2 bg-[#2f2f3d] py-2 px-7 rounded-xl text-white cursor-pointer hover:bg-[#3b3b4d] transition"
+          className="flex items-center  bg-[#2f2f3d] py-2 px-7 rounded-xl text-white cursor-pointer hover:bg-[#3b3b4d] transition"
         >
           <FaUserPlus className="text-2xl" />
           <p className="text-[18px] font-semibold">Friend Requests</p>
@@ -96,7 +110,7 @@ const FriendList = () => {
       </div>
 
       {/* Friend Requests Modal */}
-      <FriendRequestsModal isOpen={isModalOpen} onClose={closeModal}  />
+      <FriendRequestsModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 };

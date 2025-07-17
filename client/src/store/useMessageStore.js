@@ -29,7 +29,6 @@ export const useChatStore = create((set,get) => ({
     openChatSessionWithFriend: async (friendId) => {
         set({ isOpeningChat: true });
         try {
-            console.log(friendId);
             const res = await axiosInstance.post("/messages/openChat", { friendId });
 
             const { session, messages } = res.data;
@@ -40,6 +39,26 @@ export const useChatStore = create((set,get) => ({
             }
 
             return session; // Optional: in case the UI needs session._id for socket.join(roomId)
+        } catch (error) {
+            console.error("Failed to open chat:", error);
+            toast.error(error.response?.data?.message || "Could not open chat");
+        } finally {
+            set({ isOpeningChat: false });
+        }
+    },
+
+    openChatSessionWithBot: async() => {
+        set({ isOpeningChat: true});
+        try {
+            const res = await axiosInstance.post('messages/openChatWithBot');
+            const { session } = res.data;
+            
+            const getPartnerInfo = get().getPartnerInfo;
+            if(getPartnerInfo) {
+                await getPartnerInfo(session._id);
+            }
+
+            return session;
         } catch (error) {
             console.error("Failed to open chat:", error);
             toast.error(error.response?.data?.message || "Could not open chat");

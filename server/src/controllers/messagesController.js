@@ -45,7 +45,26 @@ export const getMessagesForSession = async (req, res) => {
     }
 };
 
+export const openChatSessionWithBot = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    const botUser = await User.findOne({ isBot: true });
+
+    if (!botUser) {
+      return res.status(404).json({ message: "Chatbot not available" });
+    }
+
+    const chatSession = await findOrCreateChatSession(userId, botUser._id);
+
+    return res.status(200).json({
+      session: chatSession,
+    });
+  } catch (error) {
+    console.error("Error opening chat session with bot:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 
 export const getChatPartnerInfo = async (req, res) => {
