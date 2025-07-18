@@ -6,7 +6,10 @@ import authRoutes from './src/routes/authRoutes.js';
 import messageRoutes from './src/routes/messagesRoutes.js';
 import friendRequest from './src/routes/friendReqRoutes.js'
 import { app, server } from './src/lib/socket.js';
+import path from 'path';
 
+
+const __dirname = path.resolve();
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -24,6 +27,14 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/friends', friendRequest);
+
+if(process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../client/dist")));
+
+    app.get("*",(req,res) => {
+        res.sendFile(path.join(__dirname, "../client", "dist", "index.html"));
+    })
+}
 
 
 const PORT = process.env.PORT || 5000

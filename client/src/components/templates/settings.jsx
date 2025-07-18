@@ -1,12 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
-import { TbLockPassword } from "react-icons/tb";
-import { RiVerifiedBadgeLine } from "react-icons/ri";
+
 
 const navItems = [
   { key: "profile", label: "Profile Settings", icon: <CgProfile className="size-6" />, path: "/settings/edit-profile" },
-  { key: "password", label: "Password", icon: <TbLockPassword className="size-6" />, path: "/settings/password" },
-  { key: "verification", label: "Verification", icon: <RiVerifiedBadgeLine className="size-6" />, path: "/settings/verification" },
 ];
 
 const Settings = () => {

@@ -1,0 +1,21 @@
+{
+  "name": "randomchatapp",
+  "version": "1.0.0",
+  "description": "An application made for people to talk with random people around the world, and make friends.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client",
+    "start": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Erris-dev/RandomChatApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Erris-dev/RandomChatApp/issues"
+  },
+  "homepage": "https://github.com/Erris-dev/RandomChatApp#readme"
+}
