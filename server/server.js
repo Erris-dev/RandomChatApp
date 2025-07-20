@@ -11,6 +11,7 @@ import path from 'path';
 
 const __dirname = path.resolve();
 
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
@@ -28,22 +29,27 @@ app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/friends', friendRequest);
 
-if(process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../client/dist")));
+if (process.env.NODE_ENV === "production") {
+  const staticDir = path.join(__dirname, "../client/dist");
+  app.use(express.static(staticDir));
 
-    app.get("*",(req,res) => {
-        res.sendFile(path.join(__dirname, "../client", "dist", "index.html"));
-    })
+  // Serve React app for all non-API routes, excluding /api
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(staticDir, "index.html"));
+  });
 }
-
 
 const PORT = process.env.PORT || 5000
 app.get('/', (req, res) => {
     res.send('Hello Nigga');
 });
 
-server.listen(PORT, () =>{
+server.listen(PORT, '0.0.0.0', () =>{
 
-    console.log(`Server is running on http://localhost:${PORT}`);
-    connectDB();
+    console.log(`🚀 Server is running on http://localhost:${PORT} [NODE_ENV=${process.env.NODE_ENV || 'development'}]`);
+    connectDB().then(() => console.log('✅ Database connected successfully'))
+    .catch(err => {
+      console.error('🔥 Database connection failed:', err);
+      process.exit(1); // Fail fast on DB connection error
+    });;
 });
