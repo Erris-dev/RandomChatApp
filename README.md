@@ -34,3 +34,13 @@ RandomChatApp is a simple chat application that connects users randomly for real
     ```bash
     npm start
     ```
+
+    ## 🤖 AI Chatbot Integration
+
+    Experience intelligent conversations with our integrated AI chatbot! The AI assistant enhances your chat experience by providing smart replies, answering questions, and keeping the conversation engaging. Powered by advanced natural language processing, the chatbot is available in every chat room for instant support and fun interactions.
+
+    - **Smart responses:** Get instant, context-aware replies.
+    - **Seamless integration:** Chat with the AI alongside real users.
+    - **Continuous improvement:** The AI learns and adapts for better conversations.
+
+    Try chatting with the AI and discover a new level of interaction!
